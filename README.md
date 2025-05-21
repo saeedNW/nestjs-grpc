@@ -159,7 +159,7 @@ export class ProductController implements OnModuleInit {
 		this.productService = this.client.getService<ProductsServiceClient>(PRODUCTS_SERVICE_NAME);
 	}
 
-	@Get(':id')
+	@Get()
 	findOne() {
 		return this.productService.getProduct({ id: 1 });
 	}
