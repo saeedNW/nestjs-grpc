@@ -6,6 +6,8 @@ import { resolve } from 'path';
 import { PRODUCTS_PACKAGE_NAME } from 'types/proto/products';
 
 async function bootstrap() {
+	// Create a new gRPC microservice instance with the ProductsModule
+	// Configure it to use the products proto file and package name for service definitions
 	const app = await NestFactory.createMicroservice<MicroserviceOptions>(ProductsModule, {
 		transport: Transport.GRPC,
 		options: {

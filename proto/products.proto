@@ -1,17 +1,29 @@
+// products.proto defines a gRPC service for managing product information.
+// It includes message definitions for product requests and responses,
+// allowing clients to retrieve product details using product IDs.
+
 syntax = "proto3";
 
 package products;
 
+// ProductsService provides methods for interacting with product data
 service ProductsService {
+  // GetProduct retrieves product information based on the provided product ID
   rpc GetProduct(ProductRequest) returns (ProductResponse) {}
 }
 
+// ProductRequest represents a request to get product information
 message ProductRequest {
+  // id is the unique identifier for the product
   int32 id = 1;
 }
 
+// ProductResponse contains the product information returned by the service
 message ProductResponse {
+  // id is the unique identifier for the product
   int32 id = 1;
+  // name is the product's display name
   string name = 2;
+  // price is the product's cost in cents/pennies
   int32 price = 3;
 }

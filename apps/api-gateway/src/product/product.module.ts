@@ -6,6 +6,11 @@ import { ProductController } from './product.controller';
 
 @Module({
 	imports: [
+		// Register gRPC client module for product service communication
+		// - Creates a gRPC client connection to the product microservice
+		// - Uses the products proto package name for service identification
+		// - Configures transport protocol as gRPC
+		// - Specifies path to the products protobuf definition file
 		ClientsModule.register([
 			{
 				name: PRODUCTS_PACKAGE_NAME,
