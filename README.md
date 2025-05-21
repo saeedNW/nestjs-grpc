@@ -1,3 +1,5 @@
+# NestJS gRPC Microservices Example
+
 <p align="center">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
 </p>
@@ -23,76 +25,174 @@
 
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+This project demonstrates how to build a microservices architecture using NestJS and gRPC. The application consists of:
 
-## Project setup
+1. **API Gateway** - Acts as the entry point for client requests and forwards them to the appropriate microservice
+2. **Products Service** - A microservice that handles product-related operations
 
-```bash
-$ npm install
+The communication between the API Gateway and the Products Service is implemented using gRPC, which provides efficient, type-safe RPC communication.
+
+## Project Structure
+
+```text
+nestjs-grpc/
+├── apps/
+│   ├── api-gateway/          # API Gateway service
+│   │   ├── src/
+│   │   │   ├── product/      # Product module in API Gateway
+│   │   │   │   ├── product.controller.ts
+│   │   │   │   ├── product.module.ts
+│   │   │   │   └── ...
+│   │   │   ├── api-gateway.module.ts
+│   │   │   └── ...
+│   │   └── ...
+│   ├── products/             # Products microservice
+│   │   ├── src/
+│   │   │   ├── products.controller.ts
+│   │   │   ├── products.service.ts
+│   │   │   ├── products.module.ts
+│   │   │   └── ...
+│   │   └── ...
+├── proto/                    # Protocol Buffers definitions
+│   ├── product.proto         # Product service definition
+│   └── ...
+└── ...
 ```
 
-## Compile and run the project
+## Features
+
+- **Microservices Architecture**: Modular and scalable design using NestJS
+- **gRPC Communication**: High-performance RPC framework for service-to-service communication
+- **Type Safety**: Strongly typed interfaces using Protocol Buffers
+- **API Gateway Pattern**: Single entry point for client applications
+
+## Prerequisites
+
+- Node.js (v14 or later)
+- npm or yarn
+- Protocol Buffers compiler (protoc)
+
+## Installation
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+npm install
 ```
 
-## Run tests
+## Running the Application
 
 ```bash
-# unit tests
-$ npm run test
+# Start API Gateway
+npm run start:dev api-gateway
 
-# e2e tests
-$ npm run test:e2e
+# Start Products Service
+npm run start:dev products
+```
 
-# test coverage
-$ npm run test:cov
+### Production Mode
+
+Build and start all services in production mode:
+
+```bash
+# Build
+npm run build
+
+# Build proto buffer types
+npm run proto:ts
+
+# Start
+npm run start:prod
+```
+
+## API Endpoints
+
+### Products API
+
+- **GET /product** - Get a sample product
+
+## gRPC Services
+
+### Products Service
+
+- **getProduct(ProductRequest)** - Returns product details based on the provided ID
+
+## Protocol Buffers
+
+The project uses Protocol Buffers for defining service contracts. The main proto file is located at `proto/product.proto`.
+
+Example of the Products service definition:
+
+```protobuf
+syntax = "proto3";
+
+package products;
+
+service ProductsService {
+  rpc GetProduct (ProductRequest) returns (ProductResponse);
+}
+
+message ProductRequest {
+  int32 id = 1;
+}
+
+message ProductResponse {
+  int32 id = 1;
+  string name = 2;
+  string description = 3;
+  double price = 4;
+}
+```
+
+## Implementation Details
+
+### API Gateway
+
+The API Gateway uses NestJS's ClientGrpc to communicate with the Products microservice:
+
+```typescript
+@Controller('products')
+export class ProductController implements OnModuleInit {
+	private productService: ProductsServiceClient;
+
+	constructor(@Inject(PRODUCTS_PACKAGE_NAME) private readonly client: ClientGrpc) {}
+
+	onModuleInit() {
+		this.productService = this.client.getService<ProductsServiceClient>(PRODUCTS_SERVICE_NAME);
+	}
+
+	@Get(':id')
+	findOne() {
+		return this.productService.getProduct({ id: 1 });
+	}
+}
+```
+
+### Products Microservice
+
+The Products microservice implements the gRPC service defined in the proto file:
+
+```typescript
+@Controller()
+export class ProductsController {
+	constructor(private readonly productsService: ProductsService) {}
+
+	@GrpcMethod('ProductsService', 'GetProduct')
+	getProduct(request: ProductRequest): Promise<ProductResponse> {
+		return this.productsService.getProduct(request);
+	}
+}
 ```
 
 ## Deployment
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+For deployment instructions, please refer to the [NestJS documentation](https://docs.nestjs.com/deployment).
 
 ## Resources
 
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+- [NestJS Documentation](https://docs.nestjs.com)
+- [NestJS Microservices](https://docs.nestjs.com/microservices/basics)
+- [gRPC Documentation](https://grpc.io/docs/)
+- [Protocol Buffers](https://developers.google.com/protocol-buffers)
 
 ## License
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+This project is [MIT licensed](LICENSE).
