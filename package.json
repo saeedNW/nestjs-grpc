@@ -7,9 +7,7 @@
 	"license": "UNLICENSED",
 	"scripts": {
 		"build": "nest build",
-		"proto:all": "npm run proto:nestjs && npm run proto:ts",
-		"proto:nestjs": "protoc --plugin=protoc-gen-nestjs=./node_modules/.bin/protoc-gen-nestjs --nestjs_out=./types/ ./proto/*.proto",
-		"proto:ts": "npx protoc --ts_proto_out=./types/ ./proto/*.proto --ts_proto_opt=nestjs=true",
+		"proto:ts": "protoc --plugin=protoc-gen-ts=./node_modules/.bin/protoc-gen-ts_proto --ts_out=./types/ --ts_opt=nestJs=true ./proto/*.proto",
 		"format": "prettier --write \"apps/**/*.ts\"",
 		"start": "nest start",
 		"start:dev": "nest start --watch",
@@ -45,7 +43,6 @@
 		"globals": "^16.0.0",
 		"jest": "^29.7.0",
 		"prettier": "^3.4.2",
-		"protoc-gen-nestjs": "^0.2.0",
 		"source-map-support": "^0.5.21",
 		"supertest": "^7.0.0",
 		"ts-jest": "^29.2.5",
